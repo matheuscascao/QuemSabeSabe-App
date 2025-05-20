@@ -1,70 +1,66 @@
-import React, { ButtonHTMLAttributes } from 'react';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { forwardRef } from "react";
+import { cn } from "../../lib/utils";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'success' | 'warning' | 'error';
-  size?: 'xs' | 'sm' | 'md' | 'lg';
-  fullWidth?: boolean;
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "link";
+  size?: "sm" | "md" | "lg";
   isLoading?: boolean;
-  icon?: React.ReactNode;
-  iconPosition?: 'left' | 'right';
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  children,
-  variant = 'primary',
-  size = 'md',
-  fullWidth = false,
-  isLoading = false,
-  icon,
-  iconPosition = 'left',
-  className,
-  disabled,
-  ...props
-}) => {
-  const variantClasses = {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2',
-    outline: 'bg-transparent text-gray-800 border border-gray-300 hover:bg-gray-100 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2',
-    ghost: 'bg-transparent text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-gray-400',
-    success: 'bg-success-500 text-white hover:bg-success-700 focus:ring-2 focus:ring-success-500 focus:ring-offset-2',
-    warning: 'bg-warning-500 text-white hover:bg-warning-700 focus:ring-2 focus:ring-warning-500 focus:ring-offset-2',
-    error: 'bg-error-500 text-white hover:bg-error-700 focus:ring-2 focus:ring-error-500 focus:ring-offset-2',
-  };
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      className,
+      variant = "primary",
+      size = "md",
+      isLoading = false,
+      children,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
+    const baseStyles =
+      "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
 
-  const sizeClasses = {
-    xs: 'px-2 py-1 text-xs',
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-5 py-2.5 text-lg',
-  };
+    const variants = {
+      primary: "bg-primary text-primary-foreground hover:bg-primary/90",
+      secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+      outline:
+        "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+      ghost: "hover:bg-accent hover:text-accent-foreground",
+      link: "text-primary underline-offset-4 hover:underline",
+    };
 
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors duration-200 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed';
+    const sizes = {
+      sm: "h-9 px-3 text-sm",
+      md: "h-10 px-4 py-2",
+      lg: "h-11 px-8",
+    };
 
-  const classes = twMerge(
-    clsx(
-      baseClasses,
-      variantClasses[variant],
-      sizeClasses[size],
-      fullWidth ? 'w-full' : '',
-      disabled ? 'opacity-60 cursor-not-allowed' : '',
-      className
-    )
-  );
+    return (
+      <button
+        className={cn(
+          baseStyles,
+          variants[variant],
+          sizes[size],
+          isLoading && "opacity-70 cursor-not-allowed",
+          className
+        )}
+        ref={ref}
+        disabled={disabled || isLoading}
+        {...props}
+      >
+        {isLoading ? (
+          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        ) : null}
+        {children}
+      </button>
+    );
+  }
+);
 
-  return (
-    <button
-      className={classes}
-      disabled={disabled || isLoading}
-      {...props}
-    >
-      {isLoading && (
-        <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em]" />
-      )}
-      {icon && iconPosition === 'left' && !isLoading && <span className="mr-2">{icon}</span>}
-      {children}
-      {icon && iconPosition === 'right' && <span className="ml-2">{icon}</span>}
-    </button>
-  );
-};
+Button.displayName = "Button";
+
+export { Button };

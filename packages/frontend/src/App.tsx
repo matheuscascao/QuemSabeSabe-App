@@ -1,27 +1,48 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Layout } from './components/layout/Layout';
-import { HomePage } from './pages/HomePage';
-import { CategoriesPage } from './pages/CategoriesPage';
-import { CategoryPage } from './pages/CategoryPage';
-import { QuizPage } from './pages/QuizPage';
-import { ResultsPage } from './pages/ResultsPage';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { LoginPage } from "./pages/auth/login";
+import { RegisterPage } from "./pages/auth/register";
+import { HomePage } from "./pages/HomePage";
+import { ProtectedRoute } from "./components/auth/protected-route";
+import { QuizList } from "./components/QuizList";
+import { Quiz } from "./components/Quiz";
 
-function App() {
+export function App() {
   return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/categories/:categoryId" element={<CategoryPage />} />
-          <Route path="/quiz/:quizId" element={<QuizPage />} />
-          <Route path="/results/:quizId" element={<ResultsPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quizzes"
+          element={
+            <ProtectedRoute>
+              <QuizList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quizzes/:quizId"
+          element={
+            <ProtectedRoute>
+              <Quiz />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   );
 }
-
-export default App;

@@ -6,6 +6,11 @@ import swaggerUi from "@fastify/swagger-ui";
 import { PrismaClient } from "@prisma/client";
 import { config } from "./config.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
+import { quizRoutes } from "./features/quiz/quiz.routes.js";
+
+interface JWTError extends Error {
+  code?: string;
+}
 
 // Initialize Prisma
 const prisma = new PrismaClient();
@@ -26,6 +31,41 @@ await app.register(cors, {
 
 await app.register(jwt, {
   secret: config.jwtSecret,
+});
+
+// Add JWT authentication hook
+app.addHook("onRequest", async (request, reply) => {
+  try {
+    const url = request.url;
+    if (url.startsWith("/api/v1/auth/")) {
+      return;
+    }
+    await request.jwtVerify();
+  } catch (err) {
+    const jwtError = err as JWTError;
+    if (jwtError.code === "FST_JWT_NO_AUTHORIZATION_IN_HEADER") {
+      return reply.status(401).send({
+        error: "Unauthorized",
+        message: "No authorization token provided",
+      });
+    }
+    if (jwtError.code === "FST_JWT_AUTHORIZATION_TOKEN_EXPIRED") {
+      return reply.status(401).send({
+        error: "Unauthorized",
+        message: "Authorization token expired",
+      });
+    }
+    if (jwtError.code === "FST_JWT_AUTHORIZATION_TOKEN_INVALID") {
+      return reply.status(401).send({
+        error: "Unauthorized",
+        message: "Invalid authorization token",
+      });
+    }
+    return reply.status(401).send({
+      error: "Unauthorized",
+      message: "Authentication failed",
+    });
+  }
 });
 
 // Swagger documentation
@@ -50,10 +90,7 @@ app.get("/health", async () => {
 
 // Register routes
 app.register(authRoutes, { prefix: "/api/v1/auth" });
-// TODO: Register other feature routes
-// app.register(quizRoutes, { prefix: '/api/v1/quizzes' });
-// app.register(categoryRoutes, { prefix: '/api/v1/categories' });
-// app.register(userRoutes, { prefix: '/api/v1/users' });
+app.register(quizRoutes, { prefix: "/api/v1" });
 
 // Error handling
 app.setErrorHandler(
