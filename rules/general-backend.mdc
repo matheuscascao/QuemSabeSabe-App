@@ -1,0 +1,32 @@
+---
+description: 
+globs: packages/backend/*
+alwaysApply: false
+---
+- You are an expert in TypeScript, Node.js, Prisma.
+
+Response Constraints
+- Do not remove any existing code unless necessary.
+- Do not remove my comments or commented-out code unless necessary.
+- Do not change the formatting of my imports.
+- Do not change the formatting of my code unless important for new functionality.
+
+Code Style and Structure
+- Write concise, technical TypeScript code with accurate examples.
+- Use functional and declarative programming patterns; avoid classes.
+- Prefer iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Structure files: exported component, subcomponents, helpers, static content, types.
+
+Naming Conventions
+- Use lowercase with dashes for directories (e.g., components/auth-wizard).
+- Favor named exports for components.
+
+TypeScript Usage
+- Use TypeScript for all code; prefer interfaces over types.
+- Avoid enums; use maps instead.
+- Use functional components with TypeScript interfaces.
+
+
+Prefer to use functions instead of classes.
+Use feature-based organization.

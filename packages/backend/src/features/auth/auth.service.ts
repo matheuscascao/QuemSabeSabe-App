@@ -2,80 +2,82 @@ import { FastifyInstance } from "fastify";
 import bcrypt from "bcryptjs";
 import { RegisterInput, LoginInput, AuthResponse } from "./auth.types.js";
 
-export class AuthService {
-  constructor(private app: FastifyInstance) {}
+export async function registerUser(
+  app: FastifyInstance,
+  input: RegisterInput
+): Promise<AuthResponse> {
+  const { email, username, password } = input;
 
-  async register(input: RegisterInput): Promise<AuthResponse> {
-    const { email, username, password } = input;
+  // Check if user already exists
+  const existingUser = await app.prisma.user.findFirst({
+    where: {
+      OR: [{ email }, { username }],
+    },
+  });
 
-    // Check if user already exists
-    const existingUser = await this.app.prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }],
-      },
-    });
-
-    if (existingUser) {
-      throw new Error("User with this email or username already exists");
-    }
-
-    // Hash password
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    // Create user
-    const user = await this.app.prisma.user.create({
-      data: {
-        email,
-        username,
-        passwordHash,
-      },
-    });
-
-    // Generate JWT token
-    const token = this.app.jwt.sign({ userId: user.id });
-
-    return {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        level: user.level,
-        xp: user.xp,
-      },
-    };
+  if (existingUser) {
+    throw new Error("User with this email or username already exists");
   }
 
-  async login(input: LoginInput): Promise<AuthResponse> {
-    const { email, password } = input;
+  // Hash password
+  const passwordHash = await bcrypt.hash(password, 10);
 
-    // Find user
-    const user = await this.app.prisma.user.findUnique({
-      where: { email },
-    });
+  // Create user
+  const user = await app.prisma.user.create({
+    data: {
+      email,
+      username,
+      passwordHash,
+    },
+  });
 
-    if (!user) {
-      throw new Error("Invalid email or password");
-    }
+  // Generate JWT token
+  const token = app.jwt.sign({ userId: user.id });
 
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
-    if (!isValidPassword) {
-      throw new Error("Invalid email or password");
-    }
+  return {
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      level: user.level,
+      xp: user.xp,
+    },
+  };
+}
 
-    // Generate JWT token
-    const token = this.app.jwt.sign({ userId: user.id });
+export async function loginUser(
+  app: FastifyInstance,
+  input: LoginInput
+): Promise<AuthResponse> {
+  const { email, password } = input;
 
-    return {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        level: user.level,
-        xp: user.xp,
-      },
-    };
+  // Find user
+  const user = await app.prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new Error("Invalid email or password");
   }
+
+  // Verify password
+  const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+  if (!isValidPassword) {
+    throw new Error("Invalid email or password");
+  }
+
+  // Generate JWT token
+  const token = app.jwt.sign({ userId: user.id });
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      level: user.level,
+      xp: user.xp,
+    },
+  };
 }

@@ -7,13 +7,16 @@ import { PrismaClient } from "@prisma/client";
 import { config } from "./config.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
 
+// Initialize Prisma
+const prisma = new PrismaClient();
+
 // Initialize Fastify
 const app = Fastify({
   logger: true,
 });
 
-// Initialize Prisma
-export const prisma = new PrismaClient();
+// Decorate Fastify with Prisma
+app.decorate("prisma", prisma);
 
 // Register plugins
 await app.register(cors, {
@@ -79,3 +82,9 @@ try {
   app.log.error(err);
   process.exit(1);
 }
+
+// Cleanup on shutdown
+process.on("SIGINT", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});

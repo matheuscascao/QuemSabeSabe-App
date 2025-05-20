@@ -1,0 +1,294 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# QUIZ APP - REFINED DESIGN DOCUMENT
+
+## Executive Summary
+A minimalist, educational quiz application that allows users to test their knowledge across multiple categories, create custom quizzes, and track their learning progress. The app focuses on simplicity, accessibility, and user engagement through gamification elements.
+
+## 1. Product Vision
+
+### 1.1 App Category
+- Educational Tool
+- Knowledge Quiz Game
+- Interactive Learning Platform
+
+### 1.2 Genre
+- Quiz/Trivia
+- Casual
+- Educational
+
+### 1.3 Core Value Proposition
+An intuitive quiz platform that combines learning with engagement through:
+- Clean, distraction-free interface
+- User-generated content capabilities
+- Gamification elements that encourage continued learning
+- Cross-platform accessibility
+
+### 1.4 Target Audience
+- Students seeking study aids
+- Educators creating learning materials
+- Knowledge enthusiasts
+- Casual users looking for mental stimulation
+
+### 1.5 App Overview
+The app presents users with categorized knowledge quizzes in a clean, minimalist interface. Users can select from predefined categories (Science, Math, History, etc.), choose difficulty levels, and take quizzes to earn points and achievements. Beyond consuming content, users can create and share their own quizzes, contributing to the platform's knowledge base.
+
+## 2. User Experience Design
+
+### 2.1 Interface Design Philosophy
+The interface follows minimalist design principles with:
+- Clean, uncluttered layouts
+- Intuitive navigation
+- Consistent visual hierarchy
+- Responsive design for all devices
+- Accessibility features
+
+### 2.2 Core Screens
+
+#### 2.2.1 Home Screen
+- **Header**: App logo, profile access, settings
+- **Category Selection**: Visual grid of knowledge categories with distinctive icons and color-coding
+- **Quick Access**: "Play Now" button for random quizzes
+- **Featured Content**: Highlighted quizzes, daily challenges, leaderboards
+- **Footer**: Navigation to profile, rankings, and support
+
+#### 2.2.2 Category Screen
+- Category-specific themed header
+- Difficulty level selection (Easy, Medium, Hard)
+- List of available quizzes with preview information:
+  - Quiz title
+  - Number of questions
+  - Average completion time
+  - Creator (system or user)
+  - Popularity rating
+
+#### 2.2.3 Quiz Screen
+- Question display with countdown timer
+- Multiple-choice answer selection
+- Progress indicator (current question/total)
+- Score display
+- Visual feedback for correct/incorrect answers
+
+#### 2.2.4 Results Screen
+- Final score summary
+- Performance breakdown by question
+- Earned achievements/medals
+- Personalized feedback based on performance
+- Options to retry, share results, or explore new quizzes
+
+#### 2.2.5 Quiz Creation Tools
+- Step-by-step guided interface for creating quizzes
+- Question and answer input fields with validation
+- Category and difficulty assignment
+- Preview functionality
+
+#### 2.2.6 User Profile
+- Performance statistics across categories
+- Achievement showcase
+- Created and favorite quizzes
+- Learning progress visualization
+
+### 2.3 Visual Identity
+
+#### 2.3.1 Color Scheme
+- **Base**: Neutral background with white content areas
+- **Primary Action**: Clear, vibrant accent color for interactive elements
+- **Category-Specific**: Unique color coding per knowledge domain:
+  - Science: Green spectrum
+  - Mathematics: Blue spectrum
+  - History: Amber/Sepia
+  - Sports: Red/Orange
+  - Arts: Purple/Violet
+  - Geography: Earth tones
+  - Cinema: Dark blues
+  - Technology: Cyan/Teal
+
+#### 2.3.2 Typography
+- Sans-serif primary font for readability
+- Clear hierarchy with 2-3 font weights
+- Adequate contrast ratios for accessibility
+- Size scaling for different devices
+
+#### 2.3.3 Iconography
+- Simple, recognizable icons
+- Consistent style across the application
+- Category-specific thematic elements
+- Visual feedback states (hover, active, disabled)
+
+## 3. Game Mechanics
+
+### 3.1 Quiz Structure
+- **Standard Format**: 5-10 multiple-choice questions
+- **Time Limit**: 15-30 seconds per question (adjustable)
+- **Answer Options**: 4 choices per question (1 correct)
+
+### 3.2 Scoring System
+- Base points per correct answer: 10 points
+- Time bonus: Up to 5 additional points for quick answers
+- No penalty for incorrect answers (0 points)
+- Quiz creation bonus: 15 points when others play your quiz
+
+### 3.3 Progression System
+- **Experience Points (XP)**: Accumulated through gameplay
+- **Level Progression**: 50 levels with increasing XP requirements
+- **Unlockable Content**: New quiz categories and features based on level
+
+### 3.4 Achievement System
+- **Medals**: Bronze, Silver, Gold, Platinum tiers
+- **Category Mastery**: Achievements for excelling in specific knowledge areas
+- **Creation Rewards**: Recognition for creating popular quizzes
+- **Milestone Achievements**: For completing set numbers of quizzes or reaching score thresholds
+
+### 3.5 Social Features
+- **Leaderboards**: Global and category-specific rankings
+- **Quiz Sharing**: Ability to share created quizzes via code or link
+- **Optional**: Following friends and viewing their achievements
+
+## 4. Content Strategy
+
+### 4.1 Knowledge Categories
+Initial categories:
+1. Science
+2. Mathematics
+3. History
+4. Sports
+5. Arts
+6. Geography
+7. Cinema
+8. Technology
+
+(Expandable through updates)
+
+### 4.2 Quiz Types
+- **System-Generated**: Pre-defined quizzes with verified content
+- **Daily Challenges**: Rotating featured quizzes with special rewards
+- **User-Created**: Community-generated content with moderation
+
+### 4.3 Content Quality Control
+- User-created quizzes require minimum standards (5+ questions)
+- Report functionality for inappropriate content
+- Popularity algorithm promotes high-quality content
+- Optional: Editorial review for featured content
+
+## 5. Technical Implementation
+
+### 5.1 Platform Compatibility
+- Web application (responsive)
+- Native mobile apps (iOS and Android)
+- Offline functionality for basic features
+
+### 5.2 Performance Optimization
+- Minimal loading times (under 3 seconds)
+- Efficient data storage and retrieval
+- Low memory footprint
+
+### 5.3 Data Architecture
+- User profiles and progression data
+- Quiz content database
+- Achievement tracking system
+- Analytics for user behavior
+
+## 6. Accessibility Guidelines
+
+### 6.1 Visual Accessibility
+- Adjustable text size
+- High-contrast mode
+- Color-blind friendly palette options
+- Screen reader compatibility
+
+### 6.2 Interaction Accessibility
+- Alternative input methods
+- Adjustable time limits
+- Simple navigation patterns
+- Clear error messaging
+
+### 6.3 Cognitive Accessibility
+- Clear, consistent instructions
+- Distraction-free quiz mode
+- Progress saving for interrupted sessions
+- Optional simplified interfaces
+
+## 7. User Testing Framework
+
+### 7.1 Evaluation Criteria
+- **User Satisfaction**: Subjective enjoyment and comfort
+- **Learnability**: First-time user experience
+- **Memorability**: Ease of returning after absence
+- **Efficiency**: Time to complete core tasks
+- **Error Rate**: Frequency of user mistakes
+- **Accessibility**: Usability across diverse abilities
+
+### 7.2 Testing Methods
+- Usability testing with representative users
+- A/B testing for interface variations
+- Analytics tracking for engagement metrics
+- Feedback collection through in-app surveys
+
+## 8. Development Roadmap
+
+### 8.1 Phase 1: MVP (Minimum Viable Product)
+- Core quiz functionality
+- 4 initial knowledge categories
+- Basic user profiles
+- Fundamental scoring system
+
+### 8.2 Phase 2: Creation & Customization
+- Quiz creation tools
+- User-generated content features
+- Additional categories
+- Enhanced achievement system
+
+### 8.3 Phase 3: Community & Engagement
+- Social features
+- Advanced gamification
+- Content recommendation engine
+- Extended accessibility options
+
+### 8.4 Phase 4: Expansion & Refinement
+- Additional quiz formats
+- Advanced analytics for users
+- API for educational integrations
+- Premium content options
+
+## 9. Success Metrics
+
+### 9.1 Engagement Metrics
+- Daily/Monthly active users
+- Average session duration
+- Quiz completion rate
+- Return frequency
+
+### 9.2 Content Metrics
+- Number of user-created quizzes
+- Content quality ratings
+- Category popularity distribution
+- Quiz sharing frequency
+
+### 9.3 Business Metrics
+- User acquisition cost
+- Retention rates
+- Revenue per user (if applicable)
+- Overall platform growth
+
+## 10. Technical Requirements
+
+### 10.1 Frontend Development
+- Responsive web framework
+- Optimized mobile interface
+- Consistent design system
+- Smooth animations and transitions
+
+### 10.2 Backend Requirements
+- Secure user authentication
+- Efficient database architecture
+- Content moderation capabilities
+- Analytics integration
+
+### 10.3 Infrastructure
+- Scalable cloud hosting
+- Database backup systems
+- Content delivery optimization
+- Security protocols
