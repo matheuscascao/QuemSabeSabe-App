@@ -1,6 +1,6 @@
 import { LoginResponse } from "../../src/types";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 // Get the token directly from localStorage to avoid Zustand store issues outside of components
 function getAuthToken(): string | null {
@@ -44,7 +44,7 @@ async function fetchWithAuth<T>(
 
 export const api = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
-    const response = await fetch(`${API_URL}/auth/login`, {
+    const response = await fetch(`${API_URL}/api/v1/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export const api = {
     username: string,
     password: string
   ): Promise<LoginResponse> => {
-    const response = await fetch(`${API_URL}/auth/register`, {
+    const response = await fetch(`${API_URL}/api/v1/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

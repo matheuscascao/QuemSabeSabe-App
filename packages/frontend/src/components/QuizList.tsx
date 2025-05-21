@@ -29,7 +29,7 @@ export function QuizList() {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        const response = await api.get<Category[]>("/categories");
+        const response = await api.get<Category[]>("/api/v1/categories");
         setCategories(response);
       } catch (err) {
         setError("Failed to load quizzes. Please try again later.");
