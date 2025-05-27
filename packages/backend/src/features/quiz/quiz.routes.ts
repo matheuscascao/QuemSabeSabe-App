@@ -26,31 +26,41 @@ function hasUser(
 
 export async function quizRoutes(app: FastifyInstance) {
   // Get all categories with their quizzes
-  app.get("/categories", async () => {
-    const categories = await prisma.category.findMany({
-      include: {
-        quizzes: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            difficulty: true,
-            _count: {
-              select: {
-                questions: true,
+  app.get("/categories", async (request, reply) => {
+    try {
+      const categories = await prisma.category.findMany({
+        include: {
+          quizzes: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              difficulty: true,
+              _count: {
+                select: {
+                  questions: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      });
 
-    return categories;
+      return categories;
+    } catch (error) {
+      app.log.error("Error fetching categories:", error);
+      return reply.status(500).send({
+        error: "Internal Server Error",
+        message:
+          error instanceof Error ? error.message : "Failed to fetch categories",
+      });
+    }
   });
 
   // Get a specific quiz with its questions
   app.get("/quizzes/:quizId", async (request, reply) => {
     const { quizId } = z.object({ quizId: z.string() }).parse(request.params);
+    console.log("quizId", quizId);
 
     const quiz = await prisma.quiz.findUnique({
       where: { id: quizId },
@@ -70,7 +80,9 @@ export async function quizRoutes(app: FastifyInstance) {
     });
 
     if (!quiz) {
-      return reply.status(404).send({ message: "Quiz not found" });
+      return reply
+        .status(404)
+        .send({ message: `Quiz with id ${quizId} not found` });
     }
 
     // Don't send the correct answers to the client
@@ -163,5 +175,140 @@ export async function quizRoutes(app: FastifyInstance) {
       totalQuestions: quiz.questions.length,
       xpGained,
     };
+  });
+
+  // Create a new quiz
+  app.post("/quizzes", async (request, reply) => {
+    console.log("Auth header:", request.headers.authorization);
+
+    if (!hasUser(request)) {
+      console.log("No user found in request");
+      return reply.status(401).send({
+        error: "Unauthorized",
+        message: "No valid authentication token provided",
+      });
+    }
+
+    try {
+      console.log("Full request user object:", request.user);
+      console.log("JWT Payload:", request.user);
+      const userId = request.user.id;
+      console.log("Attempting to find user with ID:", userId);
+      const createQuizSchema = z.object({
+        title: z.string().min(3).max(100),
+        description: z.string().max(500).optional(),
+        categoryId: z.string(),
+        difficulty: z.enum(["EASY", "MEDIUM", "HARD"]),
+        questions: z
+          .array(
+            z.object({
+              text: z.string().min(3).max(500),
+              options: z.array(z.string().min(1).max(200)).length(4),
+              correct: z.number().min(0).max(3),
+              timeLimit: z.number().min(5).max(120),
+              order: z.number().min(1),
+            })
+          )
+          .min(1)
+          .max(20),
+      });
+
+      console.log("Received request body:", request.body);
+      const data = createQuizSchema.parse(request.body);
+      console.log("Parsed data:", data);
+
+      // Verify if user exists
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+      console.log("User lookup result:", user);
+
+      if (!user) {
+        return reply.status(404).send({
+          error: "User Not Found",
+          message: "The authenticated user does not exist in the database",
+        });
+      }
+
+      // Verify if category exists
+      const category = await prisma.category.findUnique({
+        where: { id: data.categoryId },
+      });
+      console.log("Category lookup result:", category);
+
+      if (!category) {
+        return reply.status(404).send({ message: "Category not found" });
+      }
+
+      // Create quiz and questions in a transaction
+      const quiz = await prisma.$transaction(async (tx) => {
+        console.log("Starting transaction...");
+        // Create the quiz
+        const quiz = await tx.quiz.create({
+          data: {
+            title: data.title,
+            description: data.description,
+            categoryId: data.categoryId,
+            creatorId: userId,
+            difficulty: data.difficulty,
+          },
+        });
+        console.log("Quiz created:", quiz);
+
+        // Create all questions
+        const questions = await Promise.all(
+          data.questions.map((question) =>
+            tx.question.create({
+              data: {
+                quizId: quiz.id,
+                text: question.text,
+                options: question.options,
+                correct: question.correct,
+                timeLimit: question.timeLimit,
+                order: question.order,
+              },
+            })
+          )
+        );
+        console.log("Questions created:", questions);
+
+        return {
+          ...quiz,
+          questions: questions.map((q) => ({
+            ...q,
+            options: q.options,
+          })),
+        };
+      });
+
+      // Award XP for quiz creation (50 XP)
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          xp: {
+            increment: 50,
+          },
+          level: {
+            increment: Math.floor(50 / 100),
+          },
+        },
+      });
+
+      return quiz;
+    } catch (error) {
+      console.error("Detailed error in quiz creation:", error);
+      if (error instanceof z.ZodError) {
+        return reply.status(400).send({
+          error: "Validation Error",
+          details: error.errors,
+        });
+      }
+      return reply.status(500).send({
+        error: "Internal Server Error",
+        message:
+          error instanceof Error ? error.message : "Something went wrong",
+        details: error,
+      });
+    }
   });
 }

@@ -45,7 +45,7 @@ export function Quiz() {
 
       console.log("Fetching quiz with ID:", quizId);
       try {
-        const response = await api.get<Quiz>(`/quizzes/${quizId}`);
+        const response = await api.get<Quiz>(`/api/v1/quizzes/${quizId}`);
         console.log("Quiz response:", response);
         setQuiz(response);
       } catch (err) {
@@ -90,7 +90,7 @@ export function Quiz() {
         score: number;
         totalQuestions: number;
         xpGained: number;
-      }>(`/quizzes/${quizId}/attempt`, {
+      }>(`/api/v1/quizzes/${quizId}/attempt`, {
         answers: Object.entries(selectedAnswers).map(
           ([questionId, selectedOption]) => ({
             questionId,

@@ -10,6 +10,7 @@ import { HomePage } from "./pages/HomePage";
 import { ProtectedRoute } from "./components/auth/protected-route";
 import { QuizList } from "./components/QuizList";
 import { Quiz } from "./components/Quiz";
+import { CreateQuizPage } from "./pages/CreateQuizPage";
 
 export function App() {
   return (
@@ -30,6 +31,14 @@ export function App() {
           element={
             <ProtectedRoute>
               <QuizList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quizzes/create"
+          element={
+            <ProtectedRoute>
+              <CreateQuizPage />
             </ProtectedRoute>
           }
         />
