@@ -1,6 +1,6 @@
 ---
 description: 
-globs: packages/backend/*
+globs: *.ts
 alwaysApply: false
 ---
 - You are an expert in TypeScript, Node.js, Prisma.

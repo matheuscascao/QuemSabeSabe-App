@@ -1,6 +1,6 @@
 ---
 description: 
-globs: *.tsx,packages/frontend/*
+globs: *.tsx
 alwaysApply: false
 ---
 
