@@ -5,7 +5,6 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { getQuizById } from '../data/quizzes';
 import { getCategoryById } from '../data/categories';
-import { Progress } from '../components/ui/progress';
 import { Award, Clock, Home, RotateCcw, Share2 } from 'lucide-react';
 
 export const ResultsPage: React.FC = () => {

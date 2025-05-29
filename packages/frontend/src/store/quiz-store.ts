@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Question, Quiz, QuizResult, UserProfile } from '../types';
+import { Question, Quiz, QuizResult, UserProfile } from '../types/index';
 
 interface QuizState {
   // Current quiz taking state
@@ -49,20 +49,34 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   
   // Actions
   startQuiz: (quiz: Quiz) => {
+    console.log('Starting quiz:', quiz);
+    const initialAnswers = Array(quiz.questions.length).fill(null);
+    console.log('Initial answers:', initialAnswers);
+    
     set({
       activeQuiz: quiz,
       currentQuestionIndex: 0,
-      selectedAnswers: Array(quiz.questions.length).fill(null),
+      selectedAnswers: initialAnswers,
       startTime: Date.now(),
       endTime: null
     });
+    
+    console.log('Quiz state after start:', get());
   },
   
   answerQuestion: (questionIndex: number, answerIndex: number) => {
+    console.log('Store - Answering question:', { questionIndex, answerIndex });
     const { selectedAnswers } = get();
+    console.log('Store - Current answers:', selectedAnswers);
+    
     const newAnswers = [...selectedAnswers];
     newAnswers[questionIndex] = answerIndex;
+    
+    console.log('Store - New answers:', newAnswers);
     set({ selectedAnswers: newAnswers });
+    
+    // Log state after update
+    console.log('Store - State after answer:', get());
   },
   
   nextQuestion: () => {
@@ -122,7 +136,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     const { activeQuiz, selectedAnswers } = get();
     if (!activeQuiz) return 0;
     
-    return selectedAnswers.reduce((score, answer, index) => {
+    return selectedAnswers.reduce<number>((score, answer, index) => {
       if (answer === null) return score;
       
       const question = activeQuiz.questions[index];
@@ -137,7 +151,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     const { activeQuiz, selectedAnswers } = get();
     if (!activeQuiz) return 0;
     
-    return selectedAnswers.reduce((count, answer, index) => {
+    return selectedAnswers.reduce<number>((count, answer, index) => {
       if (answer === null) return count;
       
       const question = activeQuiz.questions[index];

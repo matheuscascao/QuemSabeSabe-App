@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
+import { Button } from "./ui/button";
+import { Volume2, VolumeX, Clock } from "lucide-react";
+import { soundManager } from "../utils/sound";
 
 interface Quiz {
   id: string;
@@ -17,6 +20,7 @@ interface Quiz {
     options: string[];
     timeLimit: number;
     order: number;
+    correct: number;
   }[];
 }
 
@@ -30,27 +34,27 @@ export function Quiz() {
   >({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [xpGained, setXpGained] = useState<number | null>(null);
+  const [hasRevealed, setHasRevealed] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number>(0);
 
   useEffect(() => {
     const fetchQuiz = async () => {
       if (!quizId) {
-        setError("Quiz ID is missing");
+        setError("ID do quiz não encontrado");
         setLoading(false);
         return;
       }
 
-      console.log("Fetching quiz with ID:", quizId);
       try {
         const response = await api.get<Quiz>(`/api/v1/quizzes/${quizId}`);
-        console.log("Quiz response:", response);
         setQuiz(response);
       } catch (err) {
         console.error("Error details:", err);
-        setError("Failed to load quiz. Please try again later.");
+        setError("Falha ao carregar o quiz. Por favor, tente novamente mais tarde.");
       } finally {
         setLoading(false);
       }
@@ -59,31 +63,62 @@ export function Quiz() {
     fetchQuiz();
   }, [quizId]);
 
+  useEffect(() => {
+    if (!quiz || hasRevealed) return;
+    
+    const currentQuestion = quiz.questions[currentQuestionIndex];
+    setTimeLeft(currentQuestion.timeLimit);
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => Math.max(0, prev - 1));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [currentQuestionIndex, quiz, hasRevealed]);
+
   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
-    console.log("Selecting answer:", { questionId, optionIndex });
-    setSelectedAnswers((prev) => {
-      const newAnswers = {
-        ...prev,
-        [questionId]: optionIndex,
-      };
-      console.log("New answers state:", newAnswers);
-      return newAnswers;
-    });
+    if (hasRevealed) return;
+    
+    setSelectedAnswers((prev) => ({
+      ...prev,
+      [questionId]: optionIndex,
+    }));
+  };
+
+  const handleCheckAnswer = async () => {
+    if (!quiz) return;
+    
+    const currentQuestion = quiz.questions[currentQuestionIndex];
+    const selectedAnswer = selectedAnswers[currentQuestion.id];
+    
+    setHasRevealed(true);
+
+    const isCorrect = selectedAnswer === currentQuestion.correct;
+    
+    if (isCorrect) {
+      await soundManager.playCorrect();
+    } else {
+      await soundManager.playIncorrect();
+    }
+
+    setTimeout(() => {
+      setHasRevealed(false);
+      
+      if (currentQuestionIndex < quiz.questions.length - 1) {
+        setCurrentQuestionIndex(prev => prev + 1);
+      } else {
+        handleSubmit();
+      }
+    }, 750);
+  };
+
+  const handleToggleMute = () => {
+    const newMutedState = soundManager.toggleMute();
+    setIsMuted(newMutedState);
   };
 
   const handleSubmit = async () => {
     if (!quiz) return;
-
-    const allQuestionsAnswered = quiz.questions.every(
-      (q) => selectedAnswers[q.id] !== undefined
-    );
-
-    if (!allQuestionsAnswered) {
-      alert("Please answer all questions before submitting.");
-      return;
-    }
-
-    setSubmitting(true);
 
     try {
       const response = await api.post<{
@@ -103,10 +138,8 @@ export function Quiz() {
       setXpGained(response.xpGained);
       setShowResults(true);
     } catch (err) {
-      setError("Failed to submit quiz. Please try again.");
+      setError("Falha ao enviar o quiz. Por favor, tente novamente.");
       console.error("Error submitting quiz:", err);
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -126,7 +159,7 @@ export function Quiz() {
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
         >
-          Try Again
+          Tentar Novamente
         </button>
       </div>
     );
@@ -135,12 +168,12 @@ export function Quiz() {
   if (!quiz) {
     return (
       <div className="text-center text-gray-500 p-4">
-        <p>Quiz not found</p>
+        <p>Quiz não encontrado</p>
         <button
           onClick={() => navigate("/")}
           className="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
         >
-          Go Back
+          Voltar
         </button>
       </div>
     );
@@ -152,7 +185,7 @@ export function Quiz() {
 
     return (
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center mb-6">Quiz Results</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Resultados do Quiz</h2>
         <div className="text-center mb-8">
           <div className="text-4xl font-bold mb-2">
             {percentage.toFixed(1)}%
@@ -162,14 +195,14 @@ export function Quiz() {
               passed ? "text-green-600" : "text-red-600"
             }`}
           >
-            {passed ? "Congratulations! You passed!" : "Try again!"}
+            {passed ? "Parabéns! Você passou!" : "Tente novamente!"}
           </div>
           <div className="text-gray-600 mt-2">
-            You got {score} out of {quiz.questions.length} questions correct.
+            Você acertou {score} de {quiz.questions.length} questões.
           </div>
           {passed && xpGained !== null && (
             <div className="text-primary font-medium mt-2">
-              You earned {xpGained} XP!
+              Você ganhou {xpGained} XP!
             </div>
           )}
         </div>
@@ -178,7 +211,7 @@ export function Quiz() {
             onClick={() => navigate("/quizzes")}
             className="px-6 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
           >
-            Back to Quizzes
+            Voltar para Quizzes
           </button>
           {!passed && (
             <button
@@ -191,7 +224,7 @@ export function Quiz() {
               }}
               className="px-6 py-2 bg-primary text-white rounded hover:bg-primary/90"
             >
-              Try Again
+              Tentar Novamente
             </button>
           )}
         </div>
@@ -204,8 +237,23 @@ export function Quiz() {
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{quiz.title}</h1>
-        <p className="text-gray-600">{quiz.description}</p>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900">{quiz.title}</h1>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full">
+              <Clock size={16} />
+              <span className="font-medium">{timeLeft}s</span>
+            </div>
+            <button
+              onClick={handleToggleMute}
+              className="p-2 rounded-full hover:bg-gray-100"
+              title={isMuted ? "Ativar sons" : "Desativar sons"}
+            >
+              {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            </button>
+          </div>
+        </div>
+        <p className="text-gray-600 mt-2">{quiz.description}</p>
         <div className="flex items-center gap-4 mt-2">
           <span
             className={`px-2 py-1 rounded text-sm ${
@@ -216,14 +264,21 @@ export function Quiz() {
                 : "bg-red-100 text-red-800"
             }`}
           >
-            {quiz.difficulty}
+            {quiz.difficulty === "EASY" ? "FÁCIL" : quiz.difficulty === "MEDIUM" ? "MÉDIO" : "DIFÍCIL"}
           </span>
           <span className="text-gray-600 text-sm">
-            {currentQuestionIndex + 1} of {quiz.questions.length} questions
+            Questão {currentQuestionIndex + 1} de {quiz.questions.length}
           </span>
-          <span className="text-gray-600 text-sm">
-            Time limit: {currentQuestion.timeLimit} seconds
-          </span>
+          <div className="flex items-center gap-1 text-gray-600 text-sm">
+            <div className="w-full bg-gray-200 rounded-full h-1.5">
+              <div 
+                className="bg-blue-600 h-1.5 rounded-full transition-all duration-1000"
+                style={{ 
+                  width: `${(timeLeft / currentQuestion.timeLimit) * 100}%`
+                }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -235,60 +290,86 @@ export function Quiz() {
           <div className="space-y-3">
             {currentQuestion.options.map((option, index) => {
               const isSelected = selectedAnswers[currentQuestion.id] === index;
+              const isCorrect = hasRevealed && index === currentQuestion.correct;
+              const isIncorrect = hasRevealed && isSelected && !isCorrect;
+              
               return (
                 <button
                   key={index}
                   onClick={() => handleAnswerSelect(currentQuestion.id, index)}
-                  style={{
-                    backgroundColor: isSelected
-                      ? "rgb(59 130 246 / 0.1)"
-                      : "white",
-                    borderColor: isSelected
-                      ? "rgb(59 130 246)"
-                      : "rgb(229 231 235)",
-                    color: isSelected ? "rgb(59 130 246)" : "inherit",
-                    fontWeight: isSelected ? "500" : "normal",
-                  }}
-                  className="w-full p-4 text-left rounded-lg border transition-colors hover:border-blue-500/50 hover:bg-gray-50"
+                  disabled={hasRevealed}
+                  className={`w-full p-4 text-left rounded-lg border-2 transition-all duration-200 ${
+                    isSelected && !hasRevealed
+                      ? "border-blue-500 bg-blue-50 text-blue-900 shadow-md"
+                      : !hasRevealed
+                      ? "border-gray-200 hover:border-blue-200 hover:bg-blue-50"
+                      : "border-transparent"
+                  } ${
+                    isCorrect
+                      ? "bg-green-100 border-green-500 text-green-900"
+                      : isIncorrect
+                      ? "bg-red-100 border-red-500 text-red-900"
+                      : ""
+                  } ${
+                    hasRevealed ? "cursor-not-allowed" : "cursor-pointer"
+                  }`}
                 >
-                  {option}
+                  <div className="flex items-center justify-between">
+                    <span>{option}</span>
+                    {hasRevealed && (isCorrect || isIncorrect) && (
+                      <span className={`ml-2 text-sm font-medium ${
+                        isCorrect ? "text-green-600" : "text-red-600"
+                      }`}>
+                        {isCorrect ? "✓ Correto" : "✗ Incorreto"}
+                      </span>
+                    )}
+                  </div>
                 </button>
               );
             })}
           </div>
         </div>
 
-        <div className="flex justify-between">
-          <button
+        <div className="flex justify-between items-center mt-6">
+          <Button
             onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
             disabled={currentQuestionIndex === 0}
-            className="px-4 py-2 text-gray-600 disabled:opacity-50"
+            variant="outline"
+            className="flex items-center gap-2 px-4 py-2 text-blue-700 border-blue-200 hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Previous
-          </button>
-          {currentQuestionIndex === quiz.questions.length - 1 ? (
-            <button
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium text-lg shadow-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-            >
-              {submitting ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Submitting...
-                </>
-              ) : (
-                "Submit Quiz"
-              )}
-            </button>
-          ) : (
-            <button
-              onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
-              className="px-6 py-2 text-blue-600 font-medium hover:text-blue-700 transition-colors"
-            >
-              Next
-            </button>
-          )}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            Anterior
+          </Button>
+
+          <div className="flex gap-3">
+            {!hasRevealed && selectedAnswers[currentQuestion.id] !== undefined && (
+              <Button
+                onClick={handleCheckAnswer}
+                variant="secondary"
+                className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+              >
+                Verificar
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5"/>
+                </svg>
+              </Button>
+            )}
+
+            {currentQuestionIndex < quiz.questions.length - 1 && (
+              <Button
+                onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
+                variant="primary"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-md hover:shadow-lg"
+              >
+                Próxima
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>
