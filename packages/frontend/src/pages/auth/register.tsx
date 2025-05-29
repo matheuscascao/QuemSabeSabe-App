@@ -4,6 +4,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { api } from "../../lib/api";
 import { useAuthStore } from "../../stores/auth";
+import { Lightbulb } from 'lucide-react';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ export function RegisterPage() {
     setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+      setError("As senhas não coincidem");
       return;
     }
 
@@ -37,7 +38,7 @@ export function RegisterPage() {
       login(response.token, response.user);
       navigate("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to register");
+      setError(err instanceof Error ? err.message : "Falha ao registrar");
     } finally {
       setIsLoading(false);
     }
@@ -50,18 +51,25 @@ export function RegisterPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md">
+        <div className="flex flex-col items-center -mt-28 mb-8">
+          <Lightbulb size={48} className="text-purple-600 mb-3" />
+          <h1 className="text-4xl font-bold text-purple-700 tracking-tight">
+            Quem Sabe, Sabe
+          </h1>
+        </div>
+
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Create a new account
+          <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">
+            Criar uma nova conta
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Or{" "}
+            Ou{" "}
             <Link
               to="/login"
               className="font-medium text-primary hover:text-primary/90"
             >
-              sign in to your account
+              entrar na sua conta
             </Link>
           </p>
         </div>
@@ -76,7 +84,7 @@ export function RegisterPage() {
           <div className="space-y-4 rounded-md shadow-sm">
             <div>
               <label htmlFor="email" className="sr-only">
-                Email address
+                Endereço de Email
               </label>
               <Input
                 id="email"
@@ -84,7 +92,7 @@ export function RegisterPage() {
                 type="email"
                 autoComplete="email"
                 required
-                placeholder="Email address"
+                placeholder="Email"
                 value={formData.email}
                 onChange={handleChange}
               />
@@ -92,7 +100,7 @@ export function RegisterPage() {
 
             <div>
               <label htmlFor="username" className="sr-only">
-                Username
+                Nome de usuário
               </label>
               <Input
                 id="username"
@@ -100,7 +108,7 @@ export function RegisterPage() {
                 type="text"
                 autoComplete="username"
                 required
-                placeholder="Username"
+                placeholder="Nome de usuário"
                 value={formData.username}
                 onChange={handleChange}
               />
@@ -108,7 +116,7 @@ export function RegisterPage() {
 
             <div>
               <label htmlFor="password" className="sr-only">
-                Password
+                Senha
               </label>
               <Input
                 id="password"
@@ -116,7 +124,7 @@ export function RegisterPage() {
                 type="password"
                 autoComplete="new-password"
                 required
-                placeholder="Password"
+                placeholder="Senha"
                 value={formData.password}
                 onChange={handleChange}
               />
@@ -124,7 +132,7 @@ export function RegisterPage() {
 
             <div>
               <label htmlFor="confirmPassword" className="sr-only">
-                Confirm Password
+                Confirmar Senha
               </label>
               <Input
                 id="confirmPassword"
@@ -132,15 +140,19 @@ export function RegisterPage() {
                 type="password"
                 autoComplete="new-password"
                 required
-                placeholder="Confirm Password"
+                placeholder="Confirmar Senha"
                 value={formData.confirmPassword}
                 onChange={handleChange}
               />
             </div>
           </div>
 
-          <Button type="submit" className="w-full" isLoading={isLoading}>
-            Create account
+          <Button 
+            type="submit" 
+            className="w-full text-white bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 focus-visible:ring-purple-500" 
+            isLoading={isLoading}
+          >
+            Criar conta
           </Button>
         </form>
       </div>
