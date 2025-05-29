@@ -74,6 +74,7 @@ export async function quizRoutes(app: FastifyInstance) {
             options: true,
             timeLimit: true,
             order: true,
+            correct: true,
           },
         },
       },
@@ -85,14 +86,7 @@ export async function quizRoutes(app: FastifyInstance) {
         .send({ message: `Quiz with id ${quizId} not found` });
     }
 
-    // Don't send the correct answers to the client
-    return {
-      ...quiz,
-      questions: quiz.questions.map((q) => ({
-        ...q,
-        options: q.options,
-      })),
-    };
+    return quiz;
   });
 
   // Submit a quiz attempt

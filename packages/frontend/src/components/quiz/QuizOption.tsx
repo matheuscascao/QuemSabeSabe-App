@@ -25,6 +25,7 @@ export const QuizOption: React.FC<QuizOptionProps> = ({
   
   const handleClick = () => {
     if (!disabled) {
+      console.log('QuizOption clicked:', index);
       onSelect(index);
     }
   };

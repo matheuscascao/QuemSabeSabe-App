@@ -25,6 +25,9 @@ importers:
       '@prisma/client':
         specifier: ^5.16.2
         version: 5.16.2(prisma@5.16.2)
+      '@quiz-master/backend':
+        specifier: 'file:'
+        version: 'link:'
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -68,6 +71,9 @@ importers:
 
   packages/frontend:
     dependencies:
+      '@quiz-master/frontend':
+        specifier: 'file:'
+        version: 'link:'
       clsx:
         specifier: ^2.1.0
         version: 2.1.1

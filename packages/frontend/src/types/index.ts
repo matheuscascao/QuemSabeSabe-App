@@ -35,11 +35,11 @@ export interface Quiz {
   id: string;
   title: string;
   description: string;
-  categoryId: CategoryId;
-  difficulty: Difficulty;
+  categoryId: string;
+  difficulty: 'easy' | 'medium' | 'hard';
   questions: Question[];
   timePerQuestion: number;
-  creator: 'system' | string;
+  creator: string;
   popularity: number;
 }
 

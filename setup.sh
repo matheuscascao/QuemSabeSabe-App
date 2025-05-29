@@ -8,10 +8,10 @@ NC='\033[0m' # No Color
 
 # Default database credentials
 DB_USER="postgres"
-DB_PASS="postgres"
+DB_PASS="NUNES"
 DB_HOST="localhost"
 DB_PORT="5432"
-DB_NAME="quizz-2"
+DB_NAME="quizz_2"
 
 # Function to check if PostgreSQL is running
 check_postgres() {

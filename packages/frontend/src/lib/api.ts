@@ -22,7 +22,6 @@ async function fetchWithAuth<T>(
   options?: RequestInit
 ): Promise<T> {
   const token = getAuthToken();
-  console.log("Auth token:", token); // Debug log
   const headers = {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
