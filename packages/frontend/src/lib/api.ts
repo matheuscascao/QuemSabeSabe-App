@@ -92,4 +92,10 @@ export const api = {
   },
 
   fetchWithAuth,
+
+  getRanking: async () => {
+    return fetchWithAuth<{ id: string; username: string; level: number; xp: number }[]>(
+      "/api/v1/auth/ranking"
+    );
+  },
 };

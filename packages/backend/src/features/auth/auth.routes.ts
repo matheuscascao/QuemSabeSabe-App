@@ -132,4 +132,24 @@ export async function authRoutes(app: FastifyInstance) {
       },
     };
   });
+
+  // Global Ranking
+  app.get("/ranking", async (request, reply) => {
+    try {
+      const users = await prisma.user.findMany({
+        select: {
+          id: true,
+          username: true,
+          level: true,
+          xp: true,
+        },
+        orderBy: {
+          xp: "desc",
+        },
+      });
+      return users;
+    } catch (error) {
+      return reply.status(500).send({ message: "Failed to fetch ranking" });
+    }
+  });
 }
