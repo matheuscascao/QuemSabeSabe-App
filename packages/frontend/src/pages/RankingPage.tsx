@@ -72,36 +72,70 @@ export function RankingPage() {
                   idx === 0
                     ? 'border-yellow-400 bg-yellow-50'
                     : idx === 1
-                    ? 'border-gray-400 bg-gray-50'
+                    ? 'border-gray-300 bg-gray-50'
                     : idx === 2
-                    ? 'border-amber-400 bg-amber-50'
-                    : u.id === user?.id
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-100'
-                } ${u.id === user?.id ? 'font-bold text-purple-700' : ''}`}
+                    ? 'border-amber-700 bg-amber-50'
+                    : 'border-purple-700 bg-purple-50'
+                } ${u.id === user?.id && idx > 2 ? 'font-bold text-purple-700' : ''}`}
               >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white border mr-2">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-white border mr-2 ${
+                  idx === 0
+                    ? 'border-yellow-400'
+                    : idx === 1
+                    ? 'border-gray-300'
+                    : idx === 2
+                    ? 'border-amber-700'
+                    : 'border-purple-700'
+                }`}>
                   {idx < 3 ? (
                     <Trophy size={22} className={
                       idx === 0
                         ? 'text-yellow-400'
                         : idx === 1
                         ? 'text-gray-400'
-                        : 'text-amber-400'
+                        : 'text-amber-700'
                     } />
                   ) : (
-                    <span className="font-bold text-lg text-gray-700">{idx + 1}</span>
+                    <span className="font-bold text-lg text-purple-700">{idx + 1}</span>
                   )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <User size={18} className="text-gray-400" />
-                    <span>{u.username}</span>
+                    <User size={18} className={
+                      idx === 0
+                        ? 'text-yellow-400'
+                        : idx === 1
+                        ? 'text-gray-400'
+                        : idx === 2
+                        ? 'text-amber-700'
+                        : 'text-purple-700'
+                    } />
+                    <span className={
+                      u.id === user?.id
+                        ? `font-bold ${
+                            idx === 0
+                              ? 'text-yellow-500'
+                              : idx === 1
+                              ? 'text-gray-400'
+                              : idx === 2
+                              ? 'text-amber-700'
+                              : 'text-purple-700'
+                          }`
+                        : ''
+                    }>{u.username}</span>
                   </div>
                   <div className="text-xs text-gray-500">Nível {u.level}</div>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="font-bold text-indigo-700">{u.xp.toLocaleString()} XP</span>
+                  <span className={`font-bold ${
+                    idx < 3
+                      ? idx === 0
+                        ? 'text-yellow-500'
+                        : idx === 1
+                        ? 'text-gray-500'
+                        : 'text-amber-700'
+                      : 'text-purple-700'
+                  }`}>{u.xp.toLocaleString()} XP</span>
                 </div>
               </li>
             ))}
