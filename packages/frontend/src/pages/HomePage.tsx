@@ -18,21 +18,6 @@ export function HomePage() {
             <div className="flex items-center">
               <h1 className="text-xl font-bold text-gray-900">Quiz Master</h1>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600">
-                <span className="font-medium">{user?.username}</span>
-                <span className="mx-2">•</span>
-                <span>Level {user?.level}</span>
-                <span className="mx-2">•</span>
-                <span>{user?.xp} XP</span>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
-              >
-                Logout
-              </button>
-            </div>
           </div>
         </div>
       </nav>
