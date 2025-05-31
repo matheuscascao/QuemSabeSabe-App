@@ -25,8 +25,8 @@ const Header = () => {
       </div>
       
       <div className="w-1/5 flex justify-end items-center relative">
-        <Star size={20} className="mr-1 text-yellow-400" />
-        <span className="mr-4 text-lg">{user?.xp ?? 0}</span>
+        <span className="mr-2 text-lg">{user?.xp ?? 0} XP</span>
+        <span className="mr-4 text-sm bg-white bg-opacity-20 px-2 py-0.5 rounded-full">Nível {user?.level ?? '-'}</span>
         <div>
           <Settings
             size={24}
