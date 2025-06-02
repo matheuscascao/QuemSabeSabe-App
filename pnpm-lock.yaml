@@ -27,7 +27,10 @@ importers:
         version: 5.16.2(prisma@5.16.2)
       '@quiz-master/backend':
         specifier: 'file:'
-        version: 'link:'
+        version: file:packages/backend(prisma@5.16.2)
+      '@quiz-master/shared':
+        specifier: workspace:*
+        version: link:../shared
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -73,7 +76,10 @@ importers:
     dependencies:
       '@quiz-master/frontend':
         specifier: 'file:'
-        version: 'link:'
+        version: file:packages/frontend(@types/react@18.3.21)
+      '@quiz-master/shared':
+        specifier: workspace:*
+        version: link:../shared
       clsx:
         specifier: ^2.1.0
         version: 2.1.1
@@ -138,6 +144,16 @@ importers:
       vite:
         specifier: ^5.4.2
         version: 5.4.19(@types/node@20.17.48)
+
+  packages/shared:
+    dependencies:
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.7
+    devDependencies:
+      typescript:
+        specifier: ^5.3.3
+        version: 5.8.3
 
 packages:
 
@@ -694,6 +710,12 @@ packages:
 
   '@prisma/get-platform@5.16.2':
     resolution: {integrity: sha512-cXiHPgNLNyj22vLouPVNegklpRL/iX2jxTeap5GRO3DmCoVyIHmJAV1CgUMUJhHlcol9yYy7EHvsnXTDJ/PKEA==}
+
+  '@quiz-master/backend@file:packages/backend':
+    resolution: {directory: packages/backend, type: directory}
+
+  '@quiz-master/frontend@file:packages/frontend':
+    resolution: {directory: packages/frontend, type: directory}
 
   '@remix-run/router@1.23.0':
     resolution: {integrity: sha512-O3rHJzAQKamUz1fvE0Qaw0xSFqsA/yafi2iqeE0pvdFtCO1viYx8QL6f3Ln/aCCTLxs68SLf0KPM9eSeM8yBnA==}
@@ -2831,6 +2853,36 @@ snapshots:
   '@prisma/get-platform@5.16.2':
     dependencies:
       '@prisma/debug': 5.16.2
+
+  '@quiz-master/backend@file:packages/backend(prisma@5.16.2)':
+    dependencies:
+      '@fastify/cors': 9.0.1
+      '@fastify/jwt': 7.2.4
+      '@fastify/swagger': 8.15.0
+      '@fastify/swagger-ui': 3.1.0
+      '@prisma/client': 5.16.2(prisma@5.16.2)
+      '@quiz-master/shared': link:packages/shared
+      bcryptjs: 2.4.3
+      dotenv: 16.5.0
+      fastify: 4.29.1
+      zod: 3.25.7
+    transitivePeerDependencies:
+      - prisma
+      - supports-color
+
+  '@quiz-master/frontend@file:packages/frontend(@types/react@18.3.21)':
+    dependencies:
+      '@quiz-master/shared': link:packages/shared
+      clsx: 2.1.1
+      lucide-react: 0.344.0(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-router-dom: 6.30.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      tailwind-merge: 2.6.0
+      zustand: 4.5.7(@types/react@18.3.21)(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - immer
 
   '@remix-run/router@1.23.0': {}
 
