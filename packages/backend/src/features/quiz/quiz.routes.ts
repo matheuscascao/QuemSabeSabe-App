@@ -109,6 +109,16 @@ export async function quizRoutes(app: FastifyInstance) {
 
     const userId = request.user.id;
 
+    // Check if user has already attempted this quiz
+    const previousAttempt = await prisma.quizAttempt.findFirst({
+      where: {
+        userId,
+        quizId,
+      },
+    });
+
+    const isFirstAttempt = !previousAttempt;
+
     // Get the quiz with questions to validate answers
     const quiz = await prisma.quiz.findUnique({
       where: { id: quizId },
@@ -148,26 +158,30 @@ export async function quizRoutes(app: FastifyInstance) {
       },
     });
 
-    // Update user XP (10 XP per correct answer)
-    const xpGained = score * 10;
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        xp: {
-          increment: xpGained,
+    // Only update user XP if this is their first attempt (10 XP per correct answer)
+    let xpGained = 0;
+    if (isFirstAttempt) {
+      xpGained = score * 10;
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          xp: {
+            increment: xpGained,
+          },
+          // Level up every 100 XP
+          level: {
+            increment: Math.floor(xpGained / 100),
+          },
         },
-        // Level up every 100 XP
-        level: {
-          increment: Math.floor(xpGained / 100),
-        },
-      },
-    });
+      });
+    }
 
     return {
       attempt,
       score,
       totalQuestions: quiz.questions.length,
       xpGained,
+      isFirstAttempt,
     };
   });
 
@@ -302,6 +316,273 @@ export async function quizRoutes(app: FastifyInstance) {
         message:
           error instanceof Error ? error.message : "Something went wrong",
         details: error,
+      });
+    }
+  });
+
+  // Get quiz-specific ranking
+  app.get("/quizzes/:quizId/ranking", async (request, reply) => {
+    try {
+      const { quizId } = z.object({ quizId: z.string() }).parse(request.params);
+
+      // Verify quiz exists
+      const quiz = await prisma.quiz.findUnique({
+        where: { id: quizId },
+        select: {
+          id: true,
+          title: true,
+          difficulty: true,
+          _count: {
+            select: {
+              questions: true,
+            },
+          },
+        },
+      });
+
+      if (!quiz) {
+        return reply.status(404).send({ message: "Quiz not found" });
+      }
+
+      // Get first attempts for each user for this quiz
+      const attempts = await prisma.quizAttempt.findMany({
+        where: { quizId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              level: true,
+              xp: true,
+            },
+          },
+        },
+        orderBy: [
+          { startedAt: "asc" }, // Earliest attempts first
+        ],
+      });
+
+      // Group by user and get their first attempt only
+      const userFirstAttempts = new Map();
+      attempts.forEach((attempt) => {
+        const userId = attempt.user.id;
+        // Only keep the first attempt (earliest startedAt) for each user
+        if (!userFirstAttempts.has(userId)) {
+          userFirstAttempts.set(userId, {
+            userId: attempt.user.id,
+            username: attempt.user.username,
+            level: attempt.user.level,
+            xp: attempt.user.xp,
+            score: attempt.score,
+            maxScore: quiz._count.questions,
+            percentage: Math.round(
+              (attempt.score / quiz._count.questions) * 100
+            ),
+            completedAt: attempt.endedAt,
+          });
+        }
+      });
+
+      // Convert to array and sort by score (desc), then by completion time (asc)
+      const ranking = Array.from(userFirstAttempts.values()).sort((a, b) => {
+        if (b.score !== a.score) {
+          return b.score - a.score;
+        }
+        return (
+          new Date(a.completedAt).getTime() - new Date(b.completedAt).getTime()
+        );
+      });
+
+      return {
+        quiz: {
+          id: quiz.id,
+          title: quiz.title,
+          difficulty: quiz.difficulty,
+          totalQuestions: quiz._count.questions,
+        },
+        ranking,
+        totalParticipants: ranking.length,
+      };
+    } catch (error) {
+      app.log.error("Error fetching quiz ranking:", error);
+      return reply.status(500).send({
+        error: "Internal Server Error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch quiz ranking",
+      });
+    }
+  });
+
+  // Get category-specific ranking
+  app.get("/categories/:categoryId/ranking", async (request, reply) => {
+    try {
+      const { categoryId } = z
+        .object({ categoryId: z.string() })
+        .parse(request.params);
+
+      // Verify category exists and get its quizzes
+      const category = await prisma.category.findUnique({
+        where: { id: categoryId },
+        include: {
+          quizzes: {
+            include: {
+              _count: {
+                select: {
+                  questions: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!category) {
+        return reply.status(404).send({ message: "Category not found" });
+      }
+
+      if (category.quizzes.length === 0) {
+        return {
+          category: {
+            id: category.id,
+            name: category.name,
+            description: category.description,
+            color: category.color,
+            totalQuizzes: 0,
+          },
+          ranking: [],
+          totalParticipants: 0,
+        };
+      }
+
+      const quizIds = category.quizzes.map((quiz) => quiz.id);
+
+      // Get all attempts for quizzes in this category, ordered by earliest first
+      const attempts = await prisma.quizAttempt.findMany({
+        where: {
+          quizId: {
+            in: quizIds,
+          },
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              level: true,
+              xp: true,
+            },
+          },
+          quiz: {
+            select: {
+              id: true,
+              title: true,
+              _count: {
+                select: {
+                  questions: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: [{ startedAt: "asc" }], // Earliest attempts first
+      });
+
+      // Group by user and calculate their category performance using first attempts only
+      const userStats = new Map();
+
+      attempts.forEach((attempt) => {
+        const userId = attempt.user.id;
+        const quizId = attempt.quiz.id;
+        const totalQuestions = attempt.quiz._count.questions;
+
+        if (!userStats.has(userId)) {
+          userStats.set(userId, {
+            userId: attempt.user.id,
+            username: attempt.user.username,
+            level: attempt.user.level,
+            xp: attempt.user.xp,
+            quizAttempts: new Map(),
+            totalScore: 0,
+            totalQuestions: 0,
+            quizCount: 0,
+            averagePercentage: 0,
+          });
+        }
+
+        const userStat = userStats.get(userId);
+
+        // Keep only the first attempt per quiz per user
+        if (!userStat.quizAttempts.has(quizId)) {
+          // This is the first attempt for this quiz by this user
+          userStat.quizCount++;
+
+          userStat.quizAttempts.set(quizId, {
+            score: attempt.score,
+            totalQuestions: totalQuestions,
+            percentage: Math.round((attempt.score / totalQuestions) * 100),
+            completedAt: attempt.endedAt,
+          });
+
+          userStat.totalScore += attempt.score;
+          userStat.totalQuestions += totalQuestions;
+          userStat.averagePercentage = Math.round(
+            (userStat.totalScore / userStat.totalQuestions) * 100
+          );
+        }
+      });
+
+      // Convert to array and sort by average percentage (desc), then by quiz count (desc), then by total score (desc)
+      const ranking = Array.from(userStats.values())
+        .map((user) => ({
+          userId: user.userId,
+          username: user.username,
+          level: user.level,
+          xp: user.xp,
+          totalScore: user.totalScore,
+          totalQuestions: user.totalQuestions,
+          averagePercentage: user.averagePercentage,
+          quizCount: user.quizCount,
+          quizAttempts: Array.from(user.quizAttempts.entries()).map(
+            ([quizId, attempt]) => ({
+              quizId,
+              ...attempt,
+            })
+          ),
+        }))
+        .sort((a, b) => {
+          // Primary: Average percentage (descending)
+          if (b.averagePercentage !== a.averagePercentage) {
+            return b.averagePercentage - a.averagePercentage;
+          }
+          // Secondary: Number of quizzes completed (descending)
+          if (b.quizCount !== a.quizCount) {
+            return b.quizCount - a.quizCount;
+          }
+          // Tertiary: Total score (descending)
+          return b.totalScore - a.totalScore;
+        });
+
+      return {
+        category: {
+          id: category.id,
+          name: category.name,
+          description: category.description,
+          color: category.color,
+          totalQuizzes: category.quizzes.length,
+        },
+        ranking,
+        totalParticipants: ranking.length,
+      };
+    } catch (error) {
+      app.log.error("Error fetching category ranking:", error);
+      return reply.status(500).send({
+        error: "Internal Server Error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch category ranking",
       });
     }
   });
