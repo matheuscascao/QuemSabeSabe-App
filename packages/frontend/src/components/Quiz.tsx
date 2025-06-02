@@ -54,7 +54,9 @@ export function Quiz() {
         setQuiz(response);
       } catch (err) {
         console.error("Error details:", err);
-        setError("Falha ao carregar o quiz. Por favor, tente novamente mais tarde.");
+        setError(
+          "Falha ao carregar o quiz. Por favor, tente novamente mais tarde."
+        );
       } finally {
         setLoading(false);
       }
@@ -65,12 +67,12 @@ export function Quiz() {
 
   useEffect(() => {
     if (!quiz || hasRevealed) return;
-    
+
     const currentQuestion = quiz.questions[currentQuestionIndex];
     setTimeLeft(currentQuestion.timeLimit);
 
     const timer = setInterval(() => {
-      setTimeLeft(prev => Math.max(0, prev - 1));
+      setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
 
     return () => clearInterval(timer);
@@ -78,7 +80,7 @@ export function Quiz() {
 
   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
     if (hasRevealed) return;
-    
+
     setSelectedAnswers((prev) => ({
       ...prev,
       [questionId]: optionIndex,
@@ -87,14 +89,14 @@ export function Quiz() {
 
   const handleCheckAnswer = async () => {
     if (!quiz) return;
-    
+
     const currentQuestion = quiz.questions[currentQuestionIndex];
     const selectedAnswer = selectedAnswers[currentQuestion.id];
-    
+
     setHasRevealed(true);
 
     const isCorrect = selectedAnswer === currentQuestion.correct;
-    
+
     if (isCorrect) {
       await soundManager.playCorrect();
     } else {
@@ -103,9 +105,9 @@ export function Quiz() {
 
     setTimeout(() => {
       setHasRevealed(false);
-      
+
       if (currentQuestionIndex < quiz.questions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
+        setCurrentQuestionIndex((prev) => prev + 1);
       } else {
         handleSubmit();
       }
@@ -185,7 +187,9 @@ export function Quiz() {
 
     return (
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center mb-6">Resultados do Quiz</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">
+          Resultados do Quiz
+        </h2>
         <div className="text-center mb-8">
           <div className="text-4xl font-bold mb-2">
             {percentage.toFixed(1)}%
@@ -264,17 +268,21 @@ export function Quiz() {
                 : "bg-red-100 text-red-800"
             }`}
           >
-            {quiz.difficulty === "EASY" ? "FÁCIL" : quiz.difficulty === "MEDIUM" ? "MÉDIO" : "DIFÍCIL"}
+            {quiz.difficulty === "EASY"
+              ? "FÁCIL"
+              : quiz.difficulty === "MEDIUM"
+              ? "MÉDIO"
+              : "DIFÍCIL"}
           </span>
           <span className="text-gray-600 text-sm">
             Questão {currentQuestionIndex + 1} de {quiz.questions.length}
           </span>
           <div className="flex items-center gap-1 text-gray-600 text-sm">
             <div className="w-full bg-gray-200 rounded-full h-1.5">
-              <div 
+              <div
                 className="bg-blue-600 h-1.5 rounded-full transition-all duration-1000"
-                style={{ 
-                  width: `${(timeLeft / currentQuestion.timeLimit) * 100}%`
+                style={{
+                  width: `${(timeLeft / currentQuestion.timeLimit) * 100}%`,
                 }}
               />
             </div>
@@ -290,9 +298,10 @@ export function Quiz() {
           <div className="space-y-3">
             {currentQuestion.options.map((option, index) => {
               const isSelected = selectedAnswers[currentQuestion.id] === index;
-              const isCorrect = hasRevealed && index === currentQuestion.correct;
+              const isCorrect =
+                hasRevealed && index === currentQuestion.correct;
               const isIncorrect = hasRevealed && isSelected && !isCorrect;
-              
+
               return (
                 <button
                   key={index}
@@ -310,16 +319,16 @@ export function Quiz() {
                       : isIncorrect
                       ? "bg-red-100 border-red-500 text-red-900"
                       : ""
-                  } ${
-                    hasRevealed ? "cursor-not-allowed" : "cursor-pointer"
-                  }`}
+                  } ${hasRevealed ? "cursor-not-allowed" : "cursor-pointer"}`}
                 >
                   <div className="flex items-center justify-between">
                     <span>{option}</span>
                     {hasRevealed && (isCorrect || isIncorrect) && (
-                      <span className={`ml-2 text-sm font-medium ${
-                        isCorrect ? "text-green-600" : "text-red-600"
-                      }`}>
+                      <span
+                        className={`ml-2 text-sm font-medium ${
+                          isCorrect ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
                         {isCorrect ? "✓ Correto" : "✗ Incorreto"}
                       </span>
                     )}
@@ -337,25 +346,46 @@ export function Quiz() {
             variant="outline"
             className="flex items-center gap-2 px-4 py-2 text-blue-700 border-blue-200 hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 18l-6-6 6-6"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M15 18l-6-6 6-6" />
             </svg>
             Anterior
           </Button>
 
           <div className="flex gap-3">
-            {!hasRevealed && selectedAnswers[currentQuestion.id] !== undefined && (
-              <Button
-                onClick={handleCheckAnswer}
-                variant="secondary"
-                className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
-              >
-                Verificar
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 6L9 17l-5-5"/>
-                </svg>
-              </Button>
-            )}
+            {!hasRevealed &&
+              selectedAnswers[currentQuestion.id] !== undefined && (
+                <Button
+                  onClick={handleCheckAnswer}
+                  variant="secondary"
+                  className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+                >
+                  Verificar
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </Button>
+              )}
 
             {currentQuestionIndex < quiz.questions.length - 1 && (
               <Button
@@ -364,8 +394,18 @@ export function Quiz() {
                 className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-md hover:shadow-lg"
               >
                 Próxima
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 18l6-6-6-6"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 18l6-6-6-6" />
                 </svg>
               </Button>
             )}

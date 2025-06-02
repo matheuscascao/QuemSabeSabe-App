@@ -15,16 +15,18 @@ import { CreateQuizPage } from "./pages/CreateQuizPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { RankingPage } from "./pages/RankingPage";
+import { QuizRankingPage } from "./pages/QuizRankingPage";
+import { CategoryRankingPage } from "./pages/CategoryRankingPage";
 
 // Create a wrapper component to use useLocation
 const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
-  const showHeaderFooter = !['/login', '/register'].includes(location.pathname);
+  const showHeaderFooter = !["/login", "/register"].includes(location.pathname);
 
   return (
     <div className="flex flex-col min-h-screen">
       {showHeaderFooter && <Header />}
-      <main className={`flex-grow ${showHeaderFooter ? 'pt-16 pb-16' : ''}`}>
+      <main className={`flex-grow ${showHeaderFooter ? "pt-16 pb-16" : ""}`}>
         {children}
       </main>
       {showHeaderFooter && <Footer />}
@@ -76,6 +78,22 @@ export function App() {
             element={
               <ProtectedRoute>
                 <RankingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quizzes/:quizId/ranking"
+            element={
+              <ProtectedRoute>
+                <QuizRankingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories/:categoryId/ranking"
+            element={
+              <ProtectedRoute>
+                <CategoryRankingPage />
               </ProtectedRoute>
             }
           />

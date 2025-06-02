@@ -94,8 +94,60 @@ export const api = {
   fetchWithAuth,
 
   getRanking: async () => {
-    return fetchWithAuth<{ id: string; username: string; level: number; xp: number }[]>(
-      "/api/v1/auth/ranking"
-    );
+    return fetchWithAuth<
+      { id: string; username: string; level: number; xp: number }[]
+    >("/api/v1/auth/ranking");
+  },
+
+  getQuizRanking: async (quizId: string) => {
+    return fetchWithAuth<{
+      quiz: {
+        id: string;
+        title: string;
+        difficulty: string;
+        totalQuestions: number;
+      };
+      ranking: Array<{
+        userId: string;
+        username: string;
+        level: number;
+        xp: number;
+        score: number;
+        maxScore: number;
+        percentage: number;
+        completedAt: string;
+      }>;
+      totalParticipants: number;
+    }>(`/api/v1/quizzes/${quizId}/ranking`);
+  },
+
+  getCategoryRanking: async (categoryId: string) => {
+    return fetchWithAuth<{
+      category: {
+        id: string;
+        name: string;
+        description: string;
+        color: string;
+        totalQuizzes: number;
+      };
+      ranking: Array<{
+        userId: string;
+        username: string;
+        level: number;
+        xp: number;
+        totalScore: number;
+        totalQuestions: number;
+        averagePercentage: number;
+        quizCount: number;
+        quizAttempts: Array<{
+          quizId: string;
+          score: number;
+          totalQuestions: number;
+          percentage: number;
+          completedAt: string;
+        }>;
+      }>;
+      totalParticipants: number;
+    }>(`/api/v1/categories/${categoryId}/ranking`);
   },
 };

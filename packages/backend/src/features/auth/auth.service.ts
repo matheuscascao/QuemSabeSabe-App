@@ -32,7 +32,11 @@ export async function registerUser(
   });
 
   // Generate JWT token
-  const token = app.jwt.sign({ userId: user.id });
+  const token = app.jwt.sign({
+    id: user.id,
+    email: user.email,
+    username: user.username,
+  });
 
   return {
     token,
@@ -68,7 +72,11 @@ export async function loginUser(
   }
 
   // Generate JWT token
-  const token = app.jwt.sign({ userId: user.id });
+  const token = app.jwt.sign({
+    id: user.id,
+    email: user.email,
+    username: user.username,
+  });
 
   return {
     token,
