@@ -13,7 +13,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc",
+    "watch": "tsc",
     "clean": "rm -rf dist"
   },
   "dependencies": {
