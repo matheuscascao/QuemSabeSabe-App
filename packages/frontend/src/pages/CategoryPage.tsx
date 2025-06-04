@@ -79,13 +79,13 @@ export const CategoryPage: React.FC = () => {
       <section>
         <div className="bg-primary-50 border border-primary-100 rounded-lg p-6 text-center">
           <h3 className="text-lg font-medium text-primary-800 mb-2">
-            Want to create your own {category.name.toLowerCase()} quiz?
+            Quer criar seu próprio quiz de {category.name.toLowerCase()}?
           </h3>
           <p className="text-primary-600 mb-4">
-            Share your knowledge with the community and challenge others!
+            Compartilhe seu conhecimento com a comunidade e desafie outros!
           </p>
           <Button variant="primary">
-            Create New Quiz
+            Criar Novo Quiz
           </Button>
         </div>
       </section>

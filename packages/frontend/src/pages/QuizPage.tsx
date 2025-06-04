@@ -194,7 +194,7 @@ export const QuizPage: React.FC = () => {
             <button
               onClick={handleToggleMute}
               className="p-2 rounded-full hover:bg-gray-200/50 transition-colors"
-              title={isMuted ? "Unmute sounds" : "Mute sounds"}
+              title={isMuted ? "Ativar sons" : "Desativar sons"}
             >
               {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
             </button>
@@ -239,7 +239,7 @@ export const QuizPage: React.FC = () => {
         {/* Explanation if answer revealed */}
         {hasRevealed && currentQuestion.explanation && (
           <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm animate-slide-up">
-            <strong className="font-medium">Explanation:</strong> {currentQuestion.explanation}
+            <strong className="font-medium">Explicação:</strong> {currentQuestion.explanation}
           </div>
         )}
       </div>
@@ -253,7 +253,7 @@ export const QuizPage: React.FC = () => {
           className="flex items-center gap-2"
         >
           <ArrowLeft size={16} />
-          Previous
+          Anterior
         </Button>
         
         <div className="flex gap-3">
@@ -263,7 +263,7 @@ export const QuizPage: React.FC = () => {
               variant="secondary"
               className="min-w-[120px]"
             >
-              Check Answer
+              Verificar Resposta
             </Button>
           )}
           
@@ -274,7 +274,7 @@ export const QuizPage: React.FC = () => {
               disabled={isAnimating}
               className="flex items-center gap-2"
             >
-              Finish Quiz
+              Finalizar Quiz
               <Flag size={16} />
             </Button>
           ) : (
@@ -284,7 +284,7 @@ export const QuizPage: React.FC = () => {
               disabled={isAnimating}
               className="flex items-center gap-2"
             >
-              Next
+              Próxima
               <ArrowRight size={16} />
             </Button>
           )}

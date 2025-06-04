@@ -48,10 +48,10 @@ export const ResultsPage: React.FC = () => {
   
   // Determine performance level based on score
   const getPerformanceLevel = () => {
-    if (scorePercentage >= 90) return { text: 'Excellent!', color: 'text-success-700' };
-    if (scorePercentage >= 70) return { text: 'Great job!', color: 'text-primary-700' };
-    if (scorePercentage >= 50) return { text: 'Good effort!', color: 'text-warning-700' };
-    return { text: 'Keep practicing!', color: 'text-error-700' };
+    if (scorePercentage >= 90) return { text: 'Excelente!', color: 'text-success-700' };
+    if (scorePercentage >= 70) return { text: 'Ótimo trabalho!', color: 'text-primary-700' };
+    if (scorePercentage >= 50) return { text: 'Bom esforço!', color: 'text-warning-700' };
+    return { text: 'Continue praticando!', color: 'text-error-700' };
   };
   
   const performance = getPerformanceLevel();
@@ -74,7 +74,7 @@ export const ResultsPage: React.FC = () => {
         </div>
         
         <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          Quiz Completed!
+          Quiz Concluído!
         </h1>
         <p className={`text-xl font-semibold ${performance.color} mb-4`}>
           {performance.text}
@@ -85,21 +85,21 @@ export const ResultsPage: React.FC = () => {
             <div className="text-3xl font-bold text-gray-900">
               {result.score}/{result.maxScore}
             </div>
-            <div className="text-sm text-gray-600">Score</div>
+            <div className="text-sm text-gray-600">Pontuação</div>
           </div>
           
           <div className="text-center">
             <div className="text-3xl font-bold text-gray-900">
               {correctCount}/{questionsCount}
             </div>
-            <div className="text-sm text-gray-600">Correct Answers</div>
+            <div className="text-sm text-gray-600">Respostas Corretas</div>
           </div>
           
           <div className="text-center">
             <div className="text-3xl font-bold text-gray-900">
               {formatTime(result.timeSpent)}
             </div>
-            <div className="text-sm text-gray-600">Time Taken</div>
+            <div className="text-sm text-gray-600">Tempo Gasto</div>
           </div>
         </div>
       </div>
@@ -152,14 +152,14 @@ export const ResultsPage: React.FC = () => {
             variant="primary"
             icon={<RotateCcw size={16} />}
           >
-            Try Again
+            Tentar Novamente
           </Button>
           <Button
             onClick={() => navigate('/')}
             variant="outline"
             icon={<Home size={16} />}
           >
-            Home
+            Início
           </Button>
         </div>
         
@@ -167,7 +167,7 @@ export const ResultsPage: React.FC = () => {
           variant="ghost"
           icon={<Share2 size={16} />}
         >
-          Share Results
+          Compartilhar Resultados
         </Button>
       </div>
       
@@ -178,12 +178,12 @@ export const ResultsPage: React.FC = () => {
               <div className="bg-primary-100 text-primary-700 p-2 rounded-full">
                 <Award size={20} />
               </div>
-              <h3 className="font-semibold text-lg text-primary-900">Quiz Achievements</h3>
+              <h3 className="font-semibold text-lg text-primary-900">Conquistas do Quiz</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white p-4 rounded-lg border border-primary-200">
-                <h4 className="font-medium text-sm text-gray-600 mb-1.5">Experience Gained</h4>
+                <h4 className="font-medium text-sm text-gray-600 mb-1.5">Experiência Ganha</h4>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold text-primary-700">+{result.score}</span>
                   <span className="text-sm text-gray-500">XP</span>
@@ -191,11 +191,11 @@ export const ResultsPage: React.FC = () => {
               </div>
               
               <div className="bg-white p-4 rounded-lg border border-primary-200">
-                <h4 className="font-medium text-sm text-gray-600 mb-1.5">Time Efficiency</h4>
+                <h4 className="font-medium text-sm text-gray-600 mb-1.5">Eficiência de Tempo</h4>
                 <div className="flex items-center gap-2">
                   <Clock size={16} className="text-primary-500" />
                   <span className="text-sm text-gray-700">
-                    {Math.round(result.timeSpent / 1000 / questionsCount)}s per question
+                    {Math.round(result.timeSpent / 1000 / questionsCount)}s por questão
                   </span>
                 </div>
               </div>
@@ -206,17 +206,17 @@ export const ResultsPage: React.FC = () => {
       
       <section className="text-center animate-fade-in animation-delay-500">
         <h3 className="text-xl font-semibold text-gray-800 mb-3">
-          Ready for another challenge?
+          Pronto para outro desafio?
         </h3>
         <p className="text-gray-600 mb-4">
-          Continue your learning journey with more quizzes
+          Continue sua jornada de aprendizado com mais quizzes
         </p>
         <Button 
           variant="primary" 
           size="lg"
           onClick={() => navigate('/categories')}
         >
-          Explore Categories
+          Explorar Categorias
         </Button>
       </section>
     </div>

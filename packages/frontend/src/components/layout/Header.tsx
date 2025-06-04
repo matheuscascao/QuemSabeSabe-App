@@ -22,7 +22,7 @@ export const Header: React.FC = () => {
           className="flex items-center space-x-2 text-primary-700 hover:text-primary-900 transition-colors"
         >
           <Brain size={32} strokeWidth={2} />
-          <span className="font-bold text-xl">Quiz Master</span>
+          <span className="font-bold text-xl">Quem Sabe Sabe</span>
         </Link>
 
         <div className="flex items-center space-x-4">
@@ -35,7 +35,7 @@ export const Header: React.FC = () => {
                   : ""
               }`}
             >
-              Home
+              Início
             </Link>
             <Link
               to="/categories"
@@ -45,7 +45,7 @@ export const Header: React.FC = () => {
                   : ""
               }`}
             >
-              Categories
+              Categorias
             </Link>
             <Link to="/quizzes/create">
               <Button
@@ -54,7 +54,7 @@ export const Header: React.FC = () => {
                 className="flex items-center gap-2"
               >
                 <Plus size={16} />
-                Create Quiz
+                Criar Quiz
               </Button>
             </Link>
           </div>
@@ -63,7 +63,7 @@ export const Header: React.FC = () => {
             <User size={18} className="text-primary-600" />
             <span className="font-medium text-sm">{userProfile.username}</span>
             <span className="ml-1 text-xs bg-primary-100 text-primary-800 px-1.5 py-0.5 rounded-full">
-              Lvl {userProfile.level}
+              Nível {userProfile.level}
             </span>
           </div>
         </div>
