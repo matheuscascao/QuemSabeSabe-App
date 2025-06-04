@@ -71,11 +71,11 @@ export function CreateQuizPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Create a New Quiz
+            Criar Novo Quiz
           </h1>
           <p className="mt-2 text-sm text-gray-600">
-            Fill in the details below to create your quiz. You can add up to 20
-            questions.
+            Preencha os detalhes abaixo para criar seu quiz. Você pode adicionar até 20
+            questões.
           </p>
         </div>
         <CreateQuizForm categories={categories} />

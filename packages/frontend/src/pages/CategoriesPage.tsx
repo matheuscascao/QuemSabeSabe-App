@@ -6,9 +6,9 @@ export const CategoriesPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 max-w-5xl">
       <header className="mb-10 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Quiz Categories</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Categorias de Quiz</h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Explore our diverse range of quiz categories and challenge yourself in your favorite subjects.
+          Explore nossa diversa gama de categorias de quiz e desafie-se nos seus assuntos favoritos.
         </p>
       </header>
 
