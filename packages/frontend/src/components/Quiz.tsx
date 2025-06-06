@@ -21,6 +21,7 @@ interface Quiz {
     timeLimit: number;
     order: number;
     correct: number;
+    explanation?: string;
   }[];
 }
 
@@ -40,6 +41,7 @@ export function Quiz() {
   const [hasRevealed, setHasRevealed] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [timeUp, setTimeUp] = useState(false);
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -72,7 +74,23 @@ export function Quiz() {
     setTimeLeft(currentQuestion.timeLimit);
 
     const timer = setInterval(() => {
-      setTimeLeft((prev) => Math.max(0, prev - 1));
+      setTimeLeft((prev) => {
+        if (prev === 1) {
+          clearInterval(timer);
+          setTimeUp(true);
+          setHasRevealed(true);
+          setTimeout(() => {
+            setTimeUp(false);
+            setHasRevealed(false);
+            if (currentQuestionIndex < quiz.questions.length - 1) {
+              setCurrentQuestionIndex((prev) => prev + 1);
+            } else {
+              handleSubmit();
+            }
+          }, 1000);
+        }
+        return Math.max(0, prev - 1);
+      });
     }, 1000);
 
     return () => clearInterval(timer);
@@ -337,31 +355,50 @@ export function Quiz() {
               );
             })}
           </div>
+          {/* Feedback visual/textual após resposta */}
+          {(hasRevealed || timeUp) && (
+            <div
+              className={`rounded-xl p-4 shadow-lg mt-6 animate-fadeIn ${
+                timeUp
+                  ? "bg-yellow-400 text-white"
+                  : selectedAnswers[currentQuestion.id] === currentQuestion.correct
+                  ? "bg-green-500 text-white"
+                  : "bg-red-500 text-white"
+              }`}
+            >
+              <div className="flex items-start">
+                {(!timeUp && selectedAnswers[currentQuestion.id] === currentQuestion.correct) && (
+                  <div className="mt-1 mr-2">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><polyline points="20 6 9 17 4 12" /></svg>
+                  </div>
+                )}
+                <div>
+                  <h4 className="font-bold mb-1">
+                    {timeUp
+                      ? "Tempo esgotado!"
+                      : selectedAnswers[currentQuestion.id] === currentQuestion.correct
+                      ? "Parabéns!"
+                      : "Ops! A resposta correta era:"}
+                  </h4>
+                  <p>
+                    {!timeUp && selectedAnswers[currentQuestion.id] !== currentQuestion.correct && (
+                      <span className="font-medium">
+                        {currentQuestion.options[currentQuestion.correct]}
+                      </span>
+                    )}
+                  </p>
+                  {currentQuestion.explanation && !timeUp && (
+                    <p className="text-sm text-white text-opacity-90 mt-1">
+                      {currentQuestion.explanation}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-between items-center mt-6">
-          <Button
-            onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
-            disabled={currentQuestionIndex === 0}
-            variant="outline"
-            className="flex items-center gap-2 px-4 py-2 text-blue-700 border-blue-200 hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-            Anterior
-          </Button>
-
           <div className="flex gap-3">
             {!hasRevealed &&
               selectedAnswers[currentQuestion.id] !== undefined && (
