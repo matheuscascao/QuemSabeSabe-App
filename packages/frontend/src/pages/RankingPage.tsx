@@ -36,8 +36,8 @@ export function RankingPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-center mb-6 text-purple-700 flex items-center justify-center gap-2">
-        <Trophy className="text-yellow-400" size={28} /> Ranking dos Campeões
+      <h1 className="text-4xl font-bold text-center mb-6 text-purple-700 flex items-center justify-center gap-2">
+       🏆 Ranking dos Campeões
       </h1>
 
       <Card className="bg-gradient-to-r from-yellow-300 to-amber-400 mb-8 p-5 rounded-xl shadow-lg">
