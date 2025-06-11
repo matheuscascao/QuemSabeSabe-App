@@ -76,6 +76,7 @@ export async function authRoutes(app: FastifyInstance) {
         username: user.username,
         level: user.level,
         xp: user.xp,
+        createdAt: user.createdAt
       },
     };
   });
@@ -129,6 +130,7 @@ export async function authRoutes(app: FastifyInstance) {
         username: user.username,
         level: user.level,
         xp: user.xp,
+        createdAt: user.createdAt
       },
     };
   });
