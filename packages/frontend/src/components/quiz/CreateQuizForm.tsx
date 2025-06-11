@@ -93,7 +93,7 @@ export function CreateQuizForm({ categories }: CreateQuizFormProps) {
         difficulty,
         questions,
       });
-      navigate("/categories");
+      navigate("/quizzes");
     } catch (error) {
       console.error("Failed to create quiz:", error);
     }
@@ -305,7 +305,7 @@ export function CreateQuizForm({ categories }: CreateQuizFormProps) {
       <div className="flex justify-end gap-4 pt-4">
         <button
           type="button"
-          onClick={() => navigate("/categories")}
+          onClick={() => navigate("/quizzes")}
           className="px-6 py-3 text-gray-700 bg-gray-100 rounded-lg font-medium hover:bg-gray-200 transition-colors"
         >
           Cancelar
