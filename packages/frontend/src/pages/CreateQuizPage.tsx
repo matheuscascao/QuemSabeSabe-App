@@ -43,41 +43,51 @@ export function CreateQuizPage() {
     if (token) {
       fetchCategories();
     } else {
-      setError("You must be logged in to create a quiz");
+      setError("Você precisa estar logado para criar um quiz");
       setIsLoading(false);
     }
   }, [token]);
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="max-w-3xl mx-auto p-4">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center px-4">
+        <div className="bg-white rounded-2xl shadow-sm p-8 max-w-md w-full text-center">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">Ops!</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white rounded-lg font-medium hover:shadow-md transition-all"
+          >
+            Tentar Novamente
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Criar Novo Quiz
-          </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Preencha os detalhes abaixo para criar seu quiz. Você pode adicionar até 20
-            questões.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Título centralizado */}
+      <div className="text-center py-8">
+        <h1 className="text-4xl font-bold text-center mb-6 text-purple-700 flex items-center justify-center gap-2">Criar Novo Quiz</h1>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Preencha os detalhes abaixo para criar seu quiz. Você pode adicionar até 20 questões.
+        </p>
+      </div>
+
+      {/* Conteúdo */}
+      <div className="pb-8 px-4">
         <CreateQuizForm categories={categories} />
       </div>
     </div>
