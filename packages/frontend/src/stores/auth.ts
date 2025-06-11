@@ -7,6 +7,7 @@ interface User {
   username: string;
   level: number;
   xp: number;
+  createdAt?: string;
 }
 
 interface AuthState {
@@ -15,6 +16,7 @@ interface AuthState {
   isAuthenticated: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
+  updateUser: (user: User) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -26,6 +28,7 @@ export const useAuthStore = create<AuthState>()(
       login: (token: string, user: User) =>
         set({ token, user, isAuthenticated: true }),
       logout: () => set({ token: null, user: null, isAuthenticated: false }),
+      updateUser: (user: User) => set((state) => ({ ...state, user })),
     }),
     {
       name: "auth-storage",

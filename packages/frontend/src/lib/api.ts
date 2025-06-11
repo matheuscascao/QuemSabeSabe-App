@@ -150,4 +150,31 @@ export const api = {
       totalParticipants: number;
     }>(`/api/v1/categories/${categoryId}/ranking`);
   },
+
+  updateUserProfile: async (data: { username: string; email: string }) => {
+    return fetchWithAuth<{ user: { id: string; email: string; username: string; level: number; xp: number } }>(
+      '/api/v1/users/me',
+      {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }
+    );
+  },
+
+  getUserAttemptsCount: async () => {
+    return fetchWithAuth<{ count: number }>('/api/v1/users/me/attempts/count');
+  },
+
+  getUserMainCategory: async () => {
+    return fetchWithAuth<{
+      mainCategory: {
+        id: string;
+        name: string;
+        icon: string;
+        color: string;
+        averagePercentage: number;
+        quizCount: number;
+      } | null;
+    }>('/api/v1/users/me/main-category');
+  },
 };

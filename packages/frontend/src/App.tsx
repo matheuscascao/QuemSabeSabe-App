@@ -17,6 +17,7 @@ import Footer from "./components/Footer";
 import { RankingPage } from "./pages/RankingPage";
 import { QuizRankingPage } from "./pages/QuizRankingPage";
 import { CategoryRankingPage } from "./pages/CategoryRankingPage";
+import { UserProfilePage } from "./pages/UserProfilePage";
 
 // Create a wrapper component to use useLocation
 const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -94,6 +95,14 @@ export function App() {
             element={
               <ProtectedRoute>
                 <CategoryRankingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <UserProfilePage />
               </ProtectedRoute>
             }
           />

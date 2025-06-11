@@ -7,6 +7,7 @@ import { PrismaClient } from "@prisma/client";
 import { config } from "./config.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
 import { quizRoutes } from "./features/quiz/quiz.routes.js";
+import { userRoutes } from "./features/user/user.routes.js";
 
 interface JWTError extends Error {
   code?: string;
@@ -91,6 +92,7 @@ app.get("/health", async () => {
 // Register routes
 app.register(authRoutes, { prefix: "/api/v1/auth" });
 app.register(quizRoutes, { prefix: "/api/v1" });
+app.register(userRoutes, { prefix: "/api/v1" });
 
 // Error handling
 app.setErrorHandler(

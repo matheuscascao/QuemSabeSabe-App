@@ -10,7 +10,7 @@ const Footer = () => {
     { name: 'Criar Quiz', icon: <PlusSquare size={24} />, path: '/quizzes/create' },
     { name: 'Jogar', icon: <Play size={24} />, path: '/quizzes' },
     { name: 'Ranking', icon: <Trophy size={24} />, path: '/ranking' },
-    { name: 'Perfil', icon: <User size={24} />, path: '/' },
+    { name: 'Perfil', icon: <User size={24} />, path: '/profile' },
   ];
 
   return (
