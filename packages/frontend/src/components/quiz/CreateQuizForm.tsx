@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuizStore } from "../../stores/quiz";
 import { useAuthStore } from "../../stores/auth";
+import { Plus, X, Clock } from "lucide-react";
 
 interface Category {
   id: string;
@@ -21,9 +22,7 @@ export function CreateQuizForm({ categories }: CreateQuizFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [difficulty, setDifficulty] = useState<"EASY" | "MEDIUM" | "HARD">(
-    "EASY"
-  );
+  const [difficulty, setDifficulty] = useState<"EASY" | "MEDIUM" | "HARD">("EASY");
   const [questions, setQuestions] = useState([
     {
       text: "",
@@ -36,8 +35,16 @@ export function CreateQuizForm({ categories }: CreateQuizFormProps) {
 
   if (!isAuthenticated) {
     return (
-      <div className="text-center p-4">
-        <p className="text-lg text-gray-600">Please log in to create a quiz.</p>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="bg-gray-50 rounded-2xl p-8 text-center max-w-md">
+          <p className="text-xl text-gray-700 mb-4">Você precisa estar logado para criar um quiz</p>
+          <button
+            onClick={() => navigate("/login")}
+            className="bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white px-6 py-3 rounded-full font-medium hover:shadow-lg transition-all"
+          >
+            Fazer Login
+          </button>
+        </div>
       </div>
     );
   }
@@ -86,28 +93,31 @@ export function CreateQuizForm({ categories }: CreateQuizFormProps) {
         difficulty,
         questions,
       });
-      navigate("/categories"); // Redirect to categories page after successful creation
+      navigate("/quizzes");
     } catch (error) {
-      // Error is handled by the store
       console.error("Failed to create quiz:", error);
     }
   };
 
+  const difficultyOptions = {
+    EASY: { label: "Fácil", color: "bg-green-100 text-green-700 border-green-300" },
+    MEDIUM: { label: "Médio", color: "bg-yellow-100 text-yellow-700 border-yellow-300" },
+    HARD: { label: "Difícil", color: "bg-red-100 text-red-700 border-red-300" }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto p-4">
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl mx-auto">
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
-      <div className="space-y-4">
+      {/* Informações Básicas */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 space-y-6">
         <div>
-          <label
-            htmlFor="title"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Quiz Title
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+            Título do Quiz
           </label>
           <input
             type="text"
@@ -117,16 +127,14 @@ export function CreateQuizForm({ categories }: CreateQuizFormProps) {
             required
             minLength={3}
             maxLength={100}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            placeholder="Digite o título do seu quiz"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
           />
         </div>
 
         <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Description (optional)
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+            Descrição (opcional)
           </label>
           <textarea
             id="description"
@@ -134,168 +142,180 @@ export function CreateQuizForm({ categories }: CreateQuizFormProps) {
             onChange={(e) => setDescription(e.target.value)}
             maxLength={500}
             rows={3}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            placeholder="Descreva seu quiz..."
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="category"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Category
-          </label>
-          <select
-            id="category"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          >
-            <option value="">Select a category</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+              Categoria
+            </label>
+            <select
+              id="category"
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+            >
+              <option value="">Selecione uma categoria</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div>
-          <label
-            htmlFor="difficulty"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Difficulty
-          </label>
-          <select
-            id="difficulty"
-            value={difficulty}
-            onChange={(e) =>
-              setDifficulty(e.target.value as "EASY" | "MEDIUM" | "HARD")
-            }
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          >
-            <option value="EASY">Easy</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HARD">Hard</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Dificuldade
+            </label>
+            <div className="flex gap-2">
+              {Object.entries(difficultyOptions).map(([value, { label, color }]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setDifficulty(value as "EASY" | "MEDIUM" | "HARD")}
+                  className={`px-4 py-2 rounded-lg font-medium border transition-all ${
+                    difficulty === value
+                      ? color
+                      : "bg-gray-50 text-gray-600 border-gray-300 hover:bg-gray-100"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-6">
+      {/* Questões */}
+      <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium text-gray-900">Questions</h3>
+          <h3 className="text-xl font-semibold text-gray-800">
+            Questões ({questions.length}/20)
+          </h3>
           <button
             type="button"
             onClick={addQuestion}
             disabled={questions.length >= 20}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white rounded-lg font-medium hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add Question
+            <Plus className="w-4 h-4" />
+            Adicionar Questão
           </button>
         </div>
 
-        {questions.map((question, index) => (
-          <div key={index} className="border rounded-lg p-4 space-y-4">
-            <div className="flex justify-between items-start">
-              <h4 className="text-md font-medium text-gray-900">
-                Question {index + 1}
-              </h4>
-              {questions.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeQuestion(index)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  Remove
-                </button>
-              )}
-            </div>
+        <div className="space-y-4">
+          {questions.map((question, index) => (
+            <div key={index} className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <h4 className="font-medium text-gray-800 flex items-center gap-2">
+                  <span className="w-7 h-7 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-sm font-semibold">
+                    {index + 1}
+                  </span>
+                  Questão {index + 1}
+                </h4>
+                {questions.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeQuestion(index)}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Question Text
-              </label>
-              <input
-                type="text"
-                value={question.text}
-                onChange={(e) => updateQuestion(index, "text", e.target.value)}
-                required
-                minLength={3}
-                maxLength={500}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Pergunta
+                </label>
+                <input
+                  type="text"
+                  value={question.text}
+                  onChange={(e) => updateQuestion(index, "text", e.target.value)}
+                  required
+                  minLength={3}
+                  maxLength={500}
+                  placeholder="Digite sua pergunta..."
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Options
-              </label>
-              {question.options.map((option, optionIndex) => (
-                <div key={optionIndex} className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name={`correct-${index}`}
-                    checked={question.correct === optionIndex}
-                    onChange={() =>
-                      updateQuestion(index, "correct", optionIndex)
-                    }
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                  />
-                  <input
-                    type="text"
-                    value={option}
-                    onChange={(e) => {
-                      const newOptions = [...question.options];
-                      newOptions[optionIndex] = e.target.value;
-                      updateQuestion(index, "options", newOptions);
-                    }}
-                    required
-                    minLength={1}
-                    maxLength={200}
-                    placeholder={`Option ${optionIndex + 1}`}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
-                </div>
-              ))}
-            </div>
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Opções de Resposta
+                </label>
+                {question.options.map((option, optionIndex) => (
+                  <div key={optionIndex} className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name={`correct-${index}`}
+                      checked={question.correct === optionIndex}
+                      onChange={() => updateQuestion(index, "correct", optionIndex)}
+                      className="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                    />
+                    <input
+                      type="text"
+                      value={option}
+                      onChange={(e) => {
+                        const newOptions = [...question.options];
+                        newOptions[optionIndex] = e.target.value;
+                        updateQuestion(index, "options", newOptions);
+                      }}
+                      required
+                      minLength={1}
+                      maxLength={200}
+                      placeholder={`Opção ${optionIndex + 1}`}
+                      className={`flex-1 px-4 py-2 rounded-lg border ${
+                        question.correct === optionIndex
+                          ? "border-purple-500 bg-purple-50"
+                          : "border-gray-300"
+                      } focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                    />
+                  </div>
+                ))}
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Time Limit (seconds)
-              </label>
-              <input
-                type="number"
-                value={question.timeLimit}
-                onChange={(e) =>
-                  updateQuestion(index, "timeLimit", parseInt(e.target.value))
-                }
-                required
-                min={5}
-                max={120}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  Tempo Limite (segundos)
+                </label>
+                <input
+                  type="number"
+                  value={question.timeLimit}
+                  onChange={(e) => updateQuestion(index, "timeLimit", parseInt(e.target.value))}
+                  required
+                  min={5}
+                  max={120}
+                  className="w-24 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      <div className="flex justify-end space-x-4">
+      {/* Botões */}
+      <div className="flex justify-end gap-4 pt-4">
         <button
           type="button"
-          onClick={() => navigate("/categories")}
-          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          onClick={() => navigate("/quizzes")}
+          className="px-6 py-3 text-gray-700 bg-gray-100 rounded-lg font-medium hover:bg-gray-200 transition-colors"
         >
-          Cancel
+          Cancelar
         </button>
         <button
           type="submit"
           disabled={isLoading}
-          className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? "Creating..." : "Create Quiz"}
+          {isLoading ? "Criando..." : "Criar Quiz"}
         </button>
       </div>
     </form>
