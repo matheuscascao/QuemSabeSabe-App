@@ -129,7 +129,7 @@ export function Quiz() {
       } else {
         handleSubmit();
       }
-    }, 750);
+    }, 2000);
   };
 
   const handleToggleMute = () => {
